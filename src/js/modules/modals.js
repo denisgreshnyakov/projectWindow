@@ -10,18 +10,68 @@ const modals = () => {
     const close = document.querySelector(closeSelector);
     const windows = document.querySelectorAll("[data-modal]");
 
+    //my const
+    const inputWidth = document.querySelector("#width");
+    const inputHeight = document.querySelector("#height");
+    const statusMessage = document.createElement("div");
+    const calcWindow = document.querySelector(".popup_calc_content");
+    const checkWindow = document.querySelector(".popup_calc_profile_content");
+    const windowProfile = document.querySelectorAll(".checkbox");
+
     trigger.forEach((item) => {
       item.addEventListener("click", (e) => {
         if (e.target) {
           e.preventDefault();
         }
 
-        windows.forEach((item) => {
-          item.style.display = "none";
-        });
+        function addInputError(window) {
+          statusMessage.classList.add("status");
+          window.appendChild(statusMessage);
+          statusMessage.textContent = "Введите все данные";
+        }
 
-        modal.style.display = "block";
-        document.body.style.overflow = "hidden";
+        function nextWindow() {
+          windows.forEach((item) => {
+            item.style.display = "none";
+          });
+
+          modal.style.display = "block";
+          document.body.style.overflow = "hidden";
+        }
+
+        if (item.classList.contains("popup_calc_button")) {
+          if (inputWidth.value !== "" && inputHeight.value !== "") {
+            if (statusMessage.textContent !== "") {
+              statusMessage.remove();
+            }
+            nextWindow();
+            return;
+          } else {
+            addInputError(calcWindow);
+            return;
+          }
+        }
+
+        if (item.classList.contains("popup_calc_profile_button")) {
+          if (statusMessage.textContent !== "") {
+            statusMessage.remove();
+          }
+          let check = false;
+          windowProfile.forEach((item, i) => {
+            if (item.checked === true) {
+              check = true;
+            }
+          });
+          if (check) {
+            nextWindow();
+            return;
+          } else {
+            addInputError(checkWindow);
+            return;
+          }
+        }
+
+        nextWindow();
         //document.body.classList.add("modal-open");
       });
     });

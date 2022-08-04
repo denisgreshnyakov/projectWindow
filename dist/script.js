@@ -17954,6 +17954,7 @@ __webpack_require__.r(__webpack_exports__);
 var forms = function forms(state) {
   var form = document.querySelectorAll("form");
   var inputs = document.querySelectorAll("input");
+  var modal = document.querySelector(".popup_calc_end");
   Object(_checkNumInputs__WEBPACK_IMPORTED_MODULE_5__["default"])('input[name="user_phone"]');
   var message = {
     loading: "Загрузка...",
@@ -18020,6 +18021,15 @@ var forms = function forms(state) {
         setTimeout(function () {
           statusMessage.remove();
         }, 5000);
+
+        for (var prop in state) {
+          delete state[prop];
+        }
+
+        setTimeout(function () {
+          modal.style.display = "none";
+          document.body.style.overflow = "";
+        }, 10000);
       });
     });
   });
@@ -18048,18 +18058,70 @@ var modals = function modals() {
     var trigger = document.querySelectorAll(triggerSelector);
     var modal = document.querySelector(modalSelector);
     var close = document.querySelector(closeSelector);
-    var windows = document.querySelectorAll("[data-modal]");
+    var windows = document.querySelectorAll("[data-modal]"); //my const
+
+    var inputWidth = document.querySelector("#width");
+    var inputHeight = document.querySelector("#height");
+    var statusMessage = document.createElement("div");
+    var calcWindow = document.querySelector(".popup_calc_content");
+    var checkWindow = document.querySelector(".popup_calc_profile_content");
+    var windowProfile = document.querySelectorAll(".checkbox");
     trigger.forEach(function (item) {
       item.addEventListener("click", function (e) {
         if (e.target) {
           e.preventDefault();
         }
 
-        windows.forEach(function (item) {
-          item.style.display = "none";
-        });
-        modal.style.display = "block";
-        document.body.style.overflow = "hidden"; //document.body.classList.add("modal-open");
+        function addInputError(window) {
+          statusMessage.classList.add("status");
+          window.appendChild(statusMessage);
+          statusMessage.textContent = "Введите все данные";
+        }
+
+        function nextWindow() {
+          windows.forEach(function (item) {
+            item.style.display = "none";
+          });
+          modal.style.display = "block";
+          document.body.style.overflow = "hidden";
+        }
+
+        if (item.classList.contains("popup_calc_button")) {
+          if (inputWidth.value !== "" && inputHeight.value !== "") {
+            if (statusMessage.textContent !== "") {
+              statusMessage.remove();
+            }
+
+            nextWindow();
+            return;
+          } else {
+            addInputError(calcWindow);
+            return;
+          }
+        }
+
+        if (item.classList.contains("popup_calc_profile_button")) {
+          if (statusMessage.textContent !== "") {
+            statusMessage.remove();
+          }
+
+          var check = false;
+          windowProfile.forEach(function (item, i) {
+            if (item.checked === true) {
+              check = true;
+            }
+          });
+
+          if (check) {
+            nextWindow();
+            return;
+          } else {
+            addInputError(checkWindow);
+            return;
+          }
+        }
+
+        nextWindow(); //document.body.classList.add("modal-open");
       });
     });
     close.addEventListener("click", function () {
